@@ -1,0 +1,35 @@
+---
+title: "Teaching with (health) data"
+---
+
+![](images/ukds-logo-col-grey.png){width="275"}
+
+## Hands-on exploration
+
+Can you find good data for your teaching?
+
+You can search our [data catalogue](https://beta.ukdataservice.ac.uk/datacatalogue/studies/?Search=#!?Search=&Page=1&Rows=10&Sort=0&DateFrom=440&DateTo=2025), or choose one or more of the following resources:
+
+1.  Teaching quantitative data analysis with Health Studies - a short guide to key data sources, with example analyses.
+
+2.  [NESSTAR – browse real survey variables online](http://nesstar.ukdataservice.ac.uk/webview/)
+
+3.  [Teaching Datasets Guide – curated resources for education](https://ukdataserviceopen.github.io/Teaching_datasets/)
+
+## Other resources
+
+[UK Data service homepage](https://ukdataservice.ac.uk/)
+
+[Teaching with data pages](https://ukdataservice.ac.uk/learning-hub/teach-with-real-data/)
+
+[Student pages](https://ukdataservice.ac.uk/learning-hub/students/) including:
+
+-   [Video Secondary analysis What and why?](https://ukdataservice.ac.uk/learning-hub/students/#doing-a-dissertation-or-project)
+
+-   [Finding and accessing data for your project](https://ukdataservice.ac.uk/learning-hub/students/resources/data-for-your-project/)
+
+-   [Using survey data in a dissertation](https://www.ukdataservice.ac.uk/learning-hub/students/resources/using-survey-data/)
+
+-   [Dissertation award](https://ukdataservice.ac.uk/learning-hub/students/dissertation-award/dissertation-award/)
+
+[Data skills modules](https://ukdataservice.ac.uk/learning-hub/data-skills-modules/)
