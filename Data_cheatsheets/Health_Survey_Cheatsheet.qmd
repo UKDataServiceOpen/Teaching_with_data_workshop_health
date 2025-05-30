@@ -1,0 +1,459 @@
+---
+title: "Teaching survey  data analysis with  Health Studies"
+author: "UK Data Service"
+date: "May 2025"
+format: 
+    html:
+      page-layout: article
+      toc: true
+      toc-location: left
+      embed-resources: true
+      code-copy: true
+---
+
+## Introduction
+
+This document provides an overview of key UK studies curated by the UK Data Service that focus on health or include a significant health component. It is designed to assist  lecturers in higher education who are looking to incorporate real health data into teaching quantitative methods or survey research. 
+
+Each section  a brief  summary of the purpose of the study, data  coverage, sample size, examples of typical health variables including  variable names. Where available, links to both research and teaching datasets on the UK Data Service website are provided. Additionally, illustrative R and Stata syntax examples are provided for demonstrating regression analyses with continuous and categorical outcomes.
+
+Please be aware that the examples do not include weights and survey design information, and are not appropriate for making population inferences.
+
+
+## 1. Health Survey for England; Scottish Health Survey; Welsh Health Survey 
+
+The HSE and the Scottish and Welsh equivalents are   cross-sectional surveys monitoring trends in health conditions and health behaviour.
+
+-   **Time & Geographic Coverage:** Annual survey from 1991 to present (excluding 2020); England.
+-   **Sample Size:** Approximately 8,000 adults and 2,000 children per year.
+collection includes interviews, physical measurements, and biological samples.
+-   **Main Webpage:** [Health Survey for England Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000021)
+*See also [Scottish Health Survey Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000047), 
+[Welsh Health Survey Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000057)*
+-   **Teaching Dataset:**
+    -   [HSE 2002 Teaching Dataset](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=5033)
+    -   [HSE 2011 Teaching Dataset](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=7402)
+-   **Variable Documentation:** Variable names and descriptions are detailed in the   "List of Variables" document available in the documentation section of each study, such as the [HSE 2019 Dataset Documentation](https://doc.ukdataservice.ac.uk/doc/8860/mrdoc/pdf/8860_hse_2019_dataset_documentation.pdf) or the  Data Dictionary included in each dataset curated by the UK Data Service.
+
+**Example Health Variables:**
+
+  -   `GenHelf2` self-assessed health
+  -   `BMIVal`: Body Mass Index
+  -   `omsysval`: Systolic Blood Pressure
+  -   `omdiaval`: Diastolic Blood Pressure
+
+<!-- -   *Mental Health:* -->
+<!--     -   `ghq12score`: GHQ-12 Score -->
+<!--     -   `mhcond`: Self-reported Mental Health Conditions -->
+
+
+::: {.callout-note collapse=true}
+
+## **Regression Examples:**
+
+:::  {.panel-tabset}
+
+####   *R:*
+
+```{r eval=F} 
+### Loading required packages
+library(haven)
+library(dplyr)
+
+### Opening the dataset
+hse19<-read_dta("~/Data/hse/UKDA-8860-stata/stata/stata13/hse_2019_eul_20211006.dta")|>
+  filter(BMIVal>0 & ag16g10>0 & topqual4>0)
+
+### Examining the data
+summary(hse19$BMIVal)
+attr(hse19$BMIVal, "label")
+hist(hse19$BMIVal)
+
+### Recoding categorical variables for clearer output
+hse19<- hse19|> mutate(
+  Sex.f=as_factor(Sex),
+  Age.f=as_factor(ag16g10),
+  qual.f=as_factor(topqual4),
+  srh=as_factor(GenHelf2)
+)|>droplevels()
+
+### Frequency tables
+table(hse19$Sex.f)
+table(hse19$Age.f)
+table(hse19$qual.f)
+table(hse19$srh)
+
+### Linear model
+model1<-glm(BMIVal~Sex.f +  Age.f + qual.f, 
+            data=hse19, 
+            family=gaussian())
+
+summary(model1)
+
+### Logistic regression
+
+### Changing the reference category of education to Degree or higher
+hse19$qual.f<-relevel(hse19$qual.f,ref="NVQ4/NVQ5/Degree or equiv")
+model2<-glm(srh=="Very good/good"~Sex.f +  Age.f + relevel(qual.f,ref="NVQ4/NVQ5/Degree or equiv"), 
+            data=hse19, 
+            family=binomial(link="logit"))
+summary(model2)
+
+### Getting the odds ratios
+or<-exp(cbind(coef(model2), confint(model2)))
+round(or,2)
+```
+
+####   *Stata:*
+
+```{stata, eval=F} 
+
+use hse_2019_eul_20211006.dta,clear
+
+*** Dropping missing data  & NAs
+keep if BMIVal>0 & ag16g10>0 & topqual4>0
+
+*** Looking at the data 
+desc Sex ag16g10 BMIVal topqual4
+summ  Sex ag16g10 BMIVal GenHelf2
+
+*** Plotting the distribution of BMI
+hist(BMIVal)
+
+*** Looking at the frequencies of categorical variables
+
+table Sex
+table ag16g10 
+table topqual4
+table GenHelf2
+
+*** Multiple linear regression
+regress BMIVal i.Sex i.ag16g10  i.topqual4 
+
+*** Logistic regression
+*** Creating a dummy variable for logistic regression
+tab GenHelf2,gen(srh)
+ta srh2
+
+logit srh2 i.Sex i.ag16g10  i.topqual4 
+
+*** Getting the odds ratios
+logit, or
+```
+
+:::
+
+:::
+
+## 2. National Survey of Sexual Attitudes and Lifestyles (Natsal)
+
+Natsal is a decennial survey exploring sexual behaviour, attitudes, and health in the UK. Topics include sexual practices, contraceptive use, and Sexually Treansmitted Infections.
+
+-   **Time & Geographic Coverage:** Conducted in 1990-91, 1999-2001,  2010-12; UK-wide.
+-   **Sample Size:** Approximately 15,000 individuals aged 16–74 per wave.
+-   **Main Webpage:** [Natsal Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000036)
+-   **Teaching Dataset:** [Natsal 2010–2012 Teaching Dataset](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=8735)
+-   **Variable Documentation:** Variable names and descriptions are available in the Data dictionary of each study, such as the [Natsal 2010–2012 Study](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=8735).
+
+**Example  variables: (Natsal 2012 Teaching Dataset) **
+
+  -   `attscale`  Sexual attraction scale (Opposite vs same sex)
+  -   `attconservative`: Sexually conservative attitudes scale
+  -   `snmedia`: Whether thinks there is too much sex in the media
+  -   `usnotused`: Whether contraceptive methods used in the last year
+  -   `dage`: Age at interview
+  -   `educ3`: Highest educational qualification grouped
+  -   `rnssecgp_4`: Respondent's NSSEC social class 4 groups 
+  -   `sexid`: Sexual identity
+
+
+
+
+::: {.callout-note collapse=true}
+## **Regression Examples:**
+
+:::  {.panel-tabset}
+
+####   *R:*
+
+``` 
+### Loading required packages
+library(haven)
+library(dplyr)
+
+### Opening the dataset
+n12<-read_dta("UKDA-8735-stata/stata/stata13/natsal_3_teaching.dta") |>
+     filter(educ3<9 &  !is.na(attconservative) & usnotused<9)
+
+
+### Examining the continuous variables
+summary(n12$attconservative)
+attr(n12$attconservative, "label")
+
+hist(n12$attconservative)
+
+summary(n12$dage)
+hist (n12$dage)
+
+### Recoding categorical variables for clearer output
+n12<- n12|> mutate(
+  sexid.f=as_factor(sexid,"both"),
+  educ3.f=as_factor(educ3,"both"),
+  cont.f=as_factor(usnotused, "both")
+)|>droplevels()
+
+### Frequency tables
+table(n12$sexid.f)
+table(n12$educ3.f)
+table(n12$n12$cont.f)
+
+### Defining GCSE as reference category for modelling
+n12$educ3.f<-relevel(n12$educ3.f,ref="[3] GCSE, O-level or equivalent")
+### Linear model
+model1<-glm(attconservative~sexid.f +  dage + educ3.f, 
+            data=n12, 
+            family=gaussian())
+
+summary(model1)
+
+### Logistic regression of whether NOT using contraception
+
+### Recoding outcome variable into 'clean'dummy variable
+
+n12 <- n12 |> mutate(wcont=case_when(
+cont.f=='[0] Using contraceptive methods at the moment' ~ 0,  
+cont.f=='[1] Not using contraceptive methods at the moment' ~ 1,  
+cont.f=='[-1] Not applicable' ~ NA  
+)
+)
+
+table(n12$cont.f,n12$wcont)
+table(n12$cont.f,is.na(n12$wcont))
+
+### Changing the reference category of education to Degree or higher
+
+model2<-glm(wcont ~ sexid.f +  dage + educ3.f, 
+            data=n12, 
+            family=binomial(link="logit"))
+summary(model2)
+
+
+### Getting the odds ratios
+or<-exp(cbind(coef(model2), confint(model2)))
+round(or,2)
+
+### Alternative, with the 'not applicable' part of the reference category:
+
+model2<-glm(cont.f=="[1] Not using contraceptive methods at the moment" ~ sexid.f +  dage + educ3.f, 
+            data=n12, 
+            family=binomial(link="logit"))
+summary(model2)
+```
+
+####   *Stata:*
+
+```{stata,eval=F}
+
+*** Opening the dataset
+use "~/Data/natsal/UKDA-8735-stata/stata/stata13/natsal_3_teaching.dta" 
+
+keep if educ3<9 &  attconservative!=. & usnotused<9
+
+
+*** Examining the continuous variables
+desc attconservative
+
+summ attconservative
+
+hist attconservative
+
+summ dage
+hist dage
+
+*** Frequency distribution of categorical variables
+
+tab sexid
+tab educ3
+tab usnotused
+
+*** Linear model 
+*** Note: changing the default reference category for educ3 to GCSE
+
+regress attconservative i.sexid dage ib3.educ3
+
+
+*** Logistic regression of whether NOT using contraception
+
+*** Recoding outcome variable into 'clean'dummy variable
+
+tab usnotused,gen(wcont)
+
+tab wcont3
+
+
+*** Model for not using vs using contraception
+logit wcont3  i.sexid    dage   ib3.educ3 if usnotused!=-1
+logit,or
+
+*** Alternative model for not using contraception vs everyone else
+logit wcont3  i.sexid    dage   ib3.educ3 
+logit,or
+
+
+```
+
+:::
+
+:::
+
+## 3. National Cancer Patient Experience Survey
+
+The National Cancer Patient Experience Survey gathers feedback from adult cancer patients recently treated by the NHS in England. It assesses patient experience across care dimensions such as diagnosis communication, treatment, and follow-up. The survey supports service evaluation and policy development.
+
+- **Time coverage**: Annually from 2010 to 2018 (most recent SN 8870 covers 2018)  
+- **Geographic coverage**: England  
+- **Typical sample size**: ~67,000 patients per year  
+- **Main page**: [Cancer Patient Experience Survey](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=8873)  
+- **Teaching dataset available**: Not currently available
+
+**Selected health variables (2018, SN 8870):**
+
+- `q50`: Access to enough support during treatment  
+- `q16`: whether involved in decisions about care
+- `q15`: whether told about side effects
+- `q59`: rating of care (1-10)
+- `ICD10BasedCan~e`: Cancer type
+- `q62`: outcome of treatment
+- `imdquinteng`: Indice of Multiple Deprivation  Rank
+- `age_band`:      Age (10 year bands)
+- `q64`: gender (Male vs Female)  
+- `ethnicity`: Ethnic groups (white vs BAME vs other)
+
+<!-- ## 3. Adult Psychiatric Morbidity Survey (APMS) -->
+
+<!-- -   **Time & Geographic Coverage:** Conducted in 1993, 2000, 2007, and 2014; England. -->
+<!-- -   **Sample Size:** Approximately 7,500 adults aged 16+ per wave. -->
+<!-- -   **Overview:** APMS assesses mental health disorder prevalence and related service use in England using diagnostic assessments and structured interviews. -->
+<!-- -   **Main Webpage:** [Psychiatric Morbidity Surveys Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000044) -->
+<!-- -   **Teaching Dataset:** Not available. -->
+<!-- -   **Variable Documentation:** Detailed variable information is provided in the dataset documentation especially the data dictionnary,  [APMS 2007 Data Documentation](https://doc.ukdataservice.ac.uk/doc/6379/mrdoc/pdf/6379_apms_2007_dataset_documentation.pdf)  -->
+
+<!-- **Example Health Variables:** -->
+
+<!-- - Health6: Anxiety, depression or other mental health issue (ever had since age 16) -->
+<!-- - HDoct6:	Doctor diagnosed: Anxiety, depression or other mental health issues -->
+<!-- - O1	CISR - OVERALL EFFECTS Way feeling stopped from getting on with things -->
+
+<!-- **Regression Examples:** -->
+
+<!-- -   *R:* -->
+
+<!-- ``` r -->
+<!-- lm(ghq12_score ~ age + sex, data = apms) -->
+<!-- glm(Health6 ~ age + sex, data = apms, family = binomial) -->
+<!-- ``` -->
+
+<!-- -   *Stata:* -->
+
+<!-- ``` stata -->
+<!-- regress ghq12_score age sex -->
+<!-- logit depression_diag age sex -->
+<!-- ``` -->
+
+------------------------------------------------------------------------
+
+## 4. Understanding Society
+
+Also known as the UK Household Longitudinal Study (UKHLS), Understanding Society  is a large-scale longitudinal panel study tracking individuals and households yearly to explore social, economic, and health change over time.
+
+-   **Time & Geographic Coverage:** Annual survey from 2009–present; UK-wide.
+-   **Sample Size:** About 40,000 households (2009)
+-   **Main Webpage:** [Understanding Society Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000053)
+-   **Teaching Dataset:** [Understanding Society Waves 1–9 Teaching Dataset](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=8715) 
+-   **Variable Documentation:** users can search for variables directly on the [website of Understanding Society](https://www.understandingsociety.ac.uk/documentation/mainstage/variables/)
+
+**Example  variables: (SN8715  - teaching dataset)**
+
+- `sf12pcs_dv`: SF-12 Physical Health Component Summary (PCS)
+- `sf12mcs_dv`: SF-12 Mental Health Component Summary (PCS)
+-  `sf1_dv`: Self-rated General Health
+- `scghq1_dv`: Subjective wellbeing (GHQ): Likert
+- `scghq2_dv`: Subjective wellbeing (GHQ): Caseness
+- `age_dv`: age (derived)
+-  `sex_dv`: sex (derived)
+- `hiqual_dv`: highest qualification (reported)
+- `wave`: wave identifier
+
+
+## 5. English Longitudinal Study of Ageing (ELSA)
+ELSA is   Longitudinal study investigating ageing, health, retirement, and quality of life among older people.
+
+-   **Time & Geographic Coverage:** Biennial waves from 2002; England.
+-   **Sample Size:** Around 12,000 individuals aged 50+ at wave 1; 7,589 at wave 10
+-   **Main Webpage:** [ELSA Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=200011)
+-   **Teaching Dataset:** [ELSA Wave 1 Teaching Dataset](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=5050)
+-   **Variable Documentation:** Variable details in the [Wave 1 Documentation](https://doc.ukdataservice.ac.uk/doc/5050/mrdoc/pdf/5050userguide.pdf).
+
+**Example Health Variables (SN 5050):**
+
+*(from the Wave 0 Common Variables dataset)*
+
+- `bmival`: Valid BMI - inc estimated>130kg
+- `heacd`: Diagnosed diabetes or high blood sugar
+- `compm8`: VIII Respiratory system
+- `ghq12scr`: GHQ Score - 12 point scale
+- `condcnt`: Number of grouped condition categories
+- `topqual3`: Highest Educational Qualification
+
+*(from the Wave 10 EUL dataset)*
+
+- `indager`: Definitive age variable collapsed at 90+
+- `indsex`: Definitive sex variable
+- `hecvllim`: Whether illness or disability limits respondents activities
+
+
+
+<!-- **Regression Examples:** -->
+
+<!-- -   *R:* -->
+
+<!-- ``` r -->
+<!-- lm(bmi ~ age + sex, data = elsa_data) -->
+<!-- glm(cesd > 3 ~ age + sex, data = elsa_data, family = binomial) -->
+<!-- ``` -->
+
+<!-- -   *Stata:* -->
+
+<!-- ``` stata -->
+<!-- regress bmi age sex -->
+<!-- gen cesd4 = cesd > 3 -->
+<!-- logit cesd4 age sex -->
+<!-- ``` -->
+
+
+## 6. Millennium Cohort Study (MCS)
+The MCS is a longitudinal birth cohort study examining child development, health, and family context. 
+
+-   **Time & Geographic Coverage:** UK-wide; children born in 2000–2002, followed regularly. Latest sweep took place in 2018 (age 17)
+-   **Sample Size:** Approximately 19,000 children at Sweep 1, 10,300 at Sweep 7.
+-   **Main Webpage:** [Millennium Cohort Study Series](https://beta.ukdataservice.ac.uk/datacatalogue/series/series?id=2000031)
+-   **Teaching Dataset:** [MCS Wave 1 Teaching Dataset](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=5557)
+-   **Variable Documentation:** Detailed variables and codes are found in the [Wave 1 Documentation](https://doc.ukdataservice.ac.uk/doc/5557/mrdoc/pdf/mcs1_guide.pdf).
+
+**Example Health Variables (SN 8682):**
+
+- `GCCGHE00`: How would you describe your health generally?
+- `GCCLSI00`: Do you have any lasting physical or mental health conditions or illnesses 
+- `GCCLSM0A`: Condition in last 12 months: Vision (for example blindness or partial sight)
+- `GCCLSM0B`: Condition in last 12 months: Hearing (for example deaf9ness or partial hearing)
+- `GCCLSM0C`: Condition in last 12 months:  Mobility (for example walking short distances or climbing stairs)
+- `GCCLSM0D`: Condition in last 12 months: Dexterity (for example lifting and carrying objects, using a keyboard)
+- `GCCLSM0H`: Condition in last 12 months: Stamina or breathing or fatigue
+- `GCPHDE00`: Feel so depressed that nothing could cheer you up (last 30 days)?
+- `GCSOME00`: On a normal week day, how many hours do you spend [on social networking or messaging]
+- `GCBMIN7`: MCS7 Body Mass Index calculated
+- `GDWEMWBS`: Sum of raw mental wellbeing scores transformed to metric scale
+
+- `GDAGI00`:   Parent/carer's  age at interview
+- `GPFCIN00`:  Parent/carer's current legal marital status
+
