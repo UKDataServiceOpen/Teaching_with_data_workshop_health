@@ -10,7 +10,7 @@ Can you find good data for your teaching?
 
 You can search our [data catalogue](https://beta.ukdataservice.ac.uk/datacatalogue/studies/?Search=#!?Search=&Page=1&Rows=10&Sort=0&DateFrom=440&DateTo=2025), or choose one or more of the following resources:
 
-1.  Teaching quantitative data analysis with Health Studies - a short guide to key data sources, with example analyses.
+1.  [Teaching with health studies](https://ukdataserviceopen.github.io/Teaching_with_data_workshop_health/Data_cheatsheets/Health_Survey_Cheatsheet.html) - a short guide to key data sources, with example analyses.
 
 2.  [NESSTAR – browse real survey variables online](http://nesstar.ukdataservice.ac.uk/webview/)
 
